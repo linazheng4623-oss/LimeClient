@@ -17,7 +17,7 @@ public class Flight extends Module {
     @Override
     public void onEnable() {
         if (mc.player == null) return;
-
+        
         wasFlying = mc.player.getAbilities().flying;
         mc.player.getAbilities().flying = true;
     }
@@ -35,17 +35,17 @@ public class Flight extends Module {
         if (mc.player == null) return;
 
         tickCounter++;
-
+        
         // Set flight speed
         mc.player.getAbilities().setFlySpeed(speed.getValue() / 10f);
-
+        
         // Handle anti-kick
         handleAntiKick();
     }
 
     private void handleAntiKick() {
-        if (antiKick.getValue() && tickCounter % 80 == 0) {
-            // Small downward movement to prevent flight kick
+        if (antiKick.getValue() && tickCounter % 80 == 0 && !mc.player.isOnGround()) {
+            // Small downward movement to prevent flight kick, but only when not on ground
             mc.player.setVelocity(mc.player.getVelocity().x, -0.04, mc.player.getVelocity().z);
         }
     }
