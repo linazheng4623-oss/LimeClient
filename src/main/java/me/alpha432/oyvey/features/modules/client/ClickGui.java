@@ -11,8 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
 
-public class ClickGui
-        extends Module {
+public class ClickGui extends Module {
     private static ClickGui INSTANCE = new ClickGui();
     public Setting<String> prefix = str("Prefix", ".");
     public Setting<Color> color = color("Color", 0, 0, 255, 180);
@@ -21,6 +20,8 @@ public class ClickGui
     public Setting<Integer> rainbowHue = num("Delay", 240, 0, 600);
     public Setting<Float> rainbowBrightness = num("Brightness", 150.0f, 1.0f, 255.0f);
     public Setting<Float> rainbowSaturation = num("Saturation", 150.0f, 1.0f, 255.0f);
+
+    private boolean screenOpenedByModule = false;
 
     public ClickGui() {
         super("ClickGui", "Opens the ClickGui", Module.Category.CLIENT);
@@ -60,7 +61,17 @@ public class ClickGui
         if (nullCheck()) {
             return;
         }
+        screenOpenedByModule = true;
         mc.setScreen(OyVeyGui.getClickGui());
+    }
+
+    @Override
+    public void onDisable() {
+        screenOpenedByModule = false;
+        // Only close the screen if it was opened by this module
+        if (mc.currentScreen instanceof OyVeyGui) {
+            mc.setScreen(null);
+        }
     }
 
     @Override
@@ -71,7 +82,9 @@ public class ClickGui
 
     @Override
     public void onTick() {
-        if (!(ClickGui.mc.currentScreen instanceof OyVeyGui)) {
+        // Only disable if the screen was opened by this module and is now closed
+        if (screenOpenedByModule && !(mc.currentScreen instanceof OyVeyGui)) {
+            screenOpenedByModule = false;
             this.disable();
         }
     }
